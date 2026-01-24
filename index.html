@@ -7,9 +7,10 @@
 
 <style>
 @font-face{
-  font-family:"Digital7";
-  src:url(data:font/woff;base64,d09GRgABAAAAAAp0ABAAAAAAGZAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAABPUy8yAAABCAAAAGAAAABgDx2eZWNtYXAAAYAAAABYAAAAXB9nA5RnbHlmAAAB+AAAAdgAAAHYbP9xGWhlYWQAAAO4AAAANgAAADYC+gDZaGhlYQAAA9AAAAAgAAAAJAgCBGhobXR4AAAD4AAAABAAAAAQAAAAGGxvY2EAAAPoAAAACAAAAAgACgAAbWF4cAAAA/QAAAAgAAAAIAEAAAFuYW1lAAAEFAAAAUQAAAFEu9m0fXBvc3QAAAVYAAAALAAAADAAAwAAeJxjYGRgYOBikGPgYQABJiDmAWJGIGYBYiYG5gCJAQAeJwAAeJxjYGRgYOBikGNgZQABJiBmAWJGIGYBYiYG5gCJAQAcHwAAAHicY2BkYGBgYOBiYGNkYGAAAhYwMDBgYmBg4GRgYQABBg4GZgZGBgYGJgYGBkAAANaAErAAAHicY2BkYGBgYOBiYGNkYGAAAhYwMDBgYmBg4GRgYQABBg4GZgZGBgYGJgYGBkAAANaAErAAAHicY2BkYGBgYOBiYGNkYGAAAhYwMDBgYmBg4GRgYQABBg4GZgZGBgYGJgYGBkAAANaAErAAA=)
-  format("woff");
+  font-family: "Digital";
+  src: local("Digital-7"), local("DS-Digital"),
+       local("Seven Segment"),
+       local("Arial");
 }
 
 *{
@@ -18,7 +19,7 @@
   box-sizing:border-box;
 }
 
-html,body{
+html, body{
   width:100%;
   height:100%;
 }
@@ -32,8 +33,9 @@ body{
 }
 
 #clock{
-  font-family:"Digital7", monospace;
+  font-family: "Digital", monospace;
   font-size:30vw;
+  font-weight:normal;
   color:white;
   line-height:1;
   user-select:none;
@@ -45,50 +47,56 @@ body{
 <div id="clock">00:00</div>
 
 <script>
-const colors=[
-  {bg:"#000",text:"#fff"},
-  {bg:"#fff",text:"#000"},
-  {bg:"#000",text:"#ff3b3b"},
-  {bg:"#000",text:"#00ff9c"},
-  {bg:"#000",text:"#00b7ff"},
-  {bg:"#000",text:"#ffb000"}
+const colors = [
+  {bg:"#000", text:"#fff"},
+  {bg:"#fff", text:"#000"},
+  {bg:"#000", text:"#ff3b3b"},
+  {bg:"#000", text:"#00ff9c"},
+  {bg:"#000", text:"#00b7ff"},
+  {bg:"#000", text:"#ffb000"}
 ];
 
-let colorIndex=Number(localStorage.getItem("colorIndex"))||0;
-const clock=document.getElementById("clock");
+let colorIndex = Number(localStorage.getItem("colorIndex")) || 0;
+const clock = document.getElementById("clock");
 
 function applyColor(){
-  document.body.style.background=colors[colorIndex].bg;
-  clock.style.color=colors[colorIndex].text;
-  localStorage.setItem("colorIndex",colorIndex);
+  document.body.style.background = colors[colorIndex].bg;
+  clock.style.color = colors[colorIndex].text;
+  localStorage.setItem("colorIndex", colorIndex);
+}
+
+function nextColor(dir){
+  colorIndex = (colorIndex + dir + colors.length) % colors.length;
+  applyColor();
 }
 
 function updateClock(){
-  const n=new Date();
-  clock.textContent=
-    String(n.getHours()).padStart(2,"0")+":"+
-    String(n.getMinutes()).padStart(2,"0");
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  clock.textContent = `${h}:${m}`;
 }
 
 applyColor();
 updateClock();
-setInterval(updateClock,1000);
+setInterval(updateClock, 1000);
 
-// Vollbild bei Tipp
-document.body.addEventListener("click",()=>{
+// Vollbild
+document.body.addEventListener("click", ()=>{
   if(!document.fullscreenElement){
     document.documentElement.requestFullscreen().catch(()=>{});
   }
 });
 
 // Wischen = Farbe wechseln
-let sx=0;
-document.addEventListener("touchstart",e=>sx=e.touches[0].clientX);
-document.addEventListener("touchend",e=>{
-  const dx=e.changedTouches[0].clientX-sx;
+let startX=0;
+document.addEventListener("touchstart", e=>{
+  startX = e.touches[0].clientX;
+});
+document.addEventListener("touchend", e=>{
+  const dx = e.changedTouches[0].clientX - startX;
   if(Math.abs(dx)>50){
-    colorIndex=(colorIndex+(dx>0?-1:1)+colors.length)%colors.length;
-    applyColor();
+    nextColor(dx>0 ? -1 : 1);
   }
 });
 </script>
