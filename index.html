@@ -5,8 +5,7 @@
 <title>Uhr</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- Digitale, moderne Schrift -->
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@900&display=swap" rel="stylesheet">
 
 <style>
 html, body {
@@ -14,7 +13,7 @@ html, body {
   padding: 0;
   width: 100%;
   height: 100%;
-  background: black;
+  background: #000;
   overflow: hidden;
 }
 
@@ -22,30 +21,29 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
 }
 
+/* Uhr */
 #clock {
   font-family: 'Rubik', sans-serif;
   font-size: 25vw;
-  color: #00b7ff;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
+
+  /* Farben wie auf dem Bild */
+  background: linear-gradient(
+    90deg,
+    #0057b8 0%,
+    #00b0ff 45%,
+    #0057b8 70%,
+    #4fa9ff 100%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+
+  /* weicher Glow */
+  filter: drop-shadow(0 0 30px rgba(0,176,255,0.35));
   user-select: none;
-}
-
-/* Farbbuttons */
-#colors {
-  position: fixed;
-  bottom: 20px;
-  display: flex;
-  gap: 12px;
-}
-
-.color {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 2px solid white;
 }
 </style>
 </head>
@@ -53,16 +51,10 @@ body {
 
 <div id="clock">00:00</div>
 
-<div id="colors">
-  <div class="color" style="background:#00b7ff" onclick="setColor('#00b7ff')"></div>
-  <div class="color" style="background:#00ff9c" onclick="setColor('#00ff9c')"></div>
-  <div class="color" style="background:#ffffff" onclick="setColor('#ffffff')"></div>
-  <div class="color" style="background:#ff4d4d" onclick="setColor('#ff4d4d')"></div>
-</div>
-
 <script>
 const clock = document.getElementById("clock");
 
+/* Uhrzeit ohne Sekunden */
 function updateTime() {
   const now = new Date();
   const h = String(now.getHours()).padStart(2, "0");
@@ -70,14 +62,12 @@ function updateTime() {
   clock.textContent = `${h}:${m}`;
 }
 
-function setColor(color) {
-  clock.style.color = color;
-  localStorage.setItem("clockColor", color);
-}
-
-// Farbe merken
-const savedColor = localStorage.getItem("clockColor");
-if (savedColor) clock.style.color = savedColor;
+/* Vollbild bei Tipp */
+document.body.addEventListener("click", () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  }
+});
 
 updateTime();
 setInterval(updateTime, 1000);
