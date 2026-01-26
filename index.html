@@ -10,67 +10,103 @@
 <style>
 html, body {
   margin: 0;
-  padding: 0;
   width: 100%;
   height: 100%;
   background: #000;
   overflow: hidden;
+
+  /* Wichtig gegen Bild-Erkennung */
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
   display: flex;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
 }
 
-/* Uhr */
-#clock {
+/* Container */
+#clock-wrapper {
+  position: relative;
+}
+
+/* Basis */
+.clock {
   font-family: 'Rubik', sans-serif;
   font-size: 25vw;
   letter-spacing: 0.06em;
-
-  /* Farben wie auf dem Bild */
-  background: linear-gradient(
-    90deg,
-    #0057b8 0%,
-    #00b0ff 45%,
-    #0057b8 70%,
-    #4fa9ff 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-
-  /* weicher Glow */
-  filter: drop-shadow(0 0 30px rgba(0,176,255,0.35));
+  line-height: 1;
   user-select: none;
+  pointer-events: none;
+}
+
+/* Untere dunkle Ebene */
+.layer-dark {
+  position: absolute;
+  inset: 0;
+  color: #0057b8;
+}
+
+/* Mittlere kräftige Ebene */
+.layer-main {
+  position: absolute;
+  inset: 0;
+  color: #0077d9;
+  opacity: 0.95;
+}
+
+/* Helle obere Ebene */
+.layer-light {
+  position: absolute;
+  inset: 0;
+  color: #4fa9ff;
+  opacity: 0.75;
+}
+
+/* Punkte */
+.dots {
+  color: #dce7f0;
+  filter: drop-shadow(0 0 10px rgba(255,255,255,0.4));
+}
+
+/* Weicher Glow */
+#clock-wrapper {
+  filter: drop-shadow(0 0 40px rgba(0,176,255,0.35));
 }
 </style>
 </head>
 <body>
 
-<div id="clock">00:00</div>
+<div id="clock-wrapper">
+  <div class="clock layer-dark">00<span class="dots">:</span>00</div>
+  <div class="clock layer-main">00<span class="dots">:</span>00</div>
+  <div class="clock layer-light">00<span class="dots">:</span>00</div>
+</div>
 
 <script>
-const clock = document.getElementById("clock");
-
-/* Uhrzeit ohne Sekunden */
 function updateTime() {
   const now = new Date();
   const h = String(now.getHours()).padStart(2, "0");
   const m = String(now.getMinutes()).padStart(2, "0");
-  clock.textContent = `${h}:${m}`;
+
+  document.querySelectorAll(".clock").forEach(el => {
+    el.innerHTML = `${h}<span class="dots">:</span>${m}`;
+  });
 }
 
-/* Vollbild bei Tipp */
-document.body.addEventListener("click", () => {
+/* Vollbild per Tipp – ohne Bildgefühl */
+document.addEventListener("click", () => {
   if (!document.fullscreenElement) {
     document.documentElement.requestFullscreen().catch(() => {});
   }
 });
-  document.addEventListener("contextmenu",e=>e.preventDefault());
-document.addEventListener("dragstart",e=>e.preventDefault());
 
+/* Extra Schutz */
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("dragstart", e => e.preventDefault());
 
 updateTime();
 setInterval(updateTime, 1000);
