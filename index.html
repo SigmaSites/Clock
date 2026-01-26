@@ -3,114 +3,124 @@
 <head>
 <meta charset="UTF-8">
 <title>Uhr</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
 
-<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@900&display=swap" rel="stylesheet">
+<!-- PWA Manifest (inline) -->
+<link rel="manifest" href="data:application/json,{
+  &quot;name&quot;:&quot;Uhr&quot;,
+  &quot;short_name&quot;:&quot;Uhr&quot;,
+  &quot;display&quot;:&quot;fullscreen&quot;,
+  &quot;orientation&quot;:&quot;landscape&quot;,
+  &quot;background_color&quot;:&quot;#000000&quot;,
+  &quot;theme_color&quot;:&quot;#000000&quot;
+}">
 
 <style>
-html, body {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  background: #000;
-  overflow: hidden;
-
-  /* Wichtig gegen Bild-Erkennung */
-  -webkit-user-select: none;
-  user-select: none;
-  -webkit-touch-callout: none;
-  -webkit-tap-highlight-color: transparent;
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
 }
 
-body {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+html,body{
+  width:100%;
+  height:100%;
+  background:#000;
+  overflow:hidden;
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+  -webkit-tap-highlight-color:transparent;
 }
 
-/* Container */
-#clock-wrapper {
-  position: relative;
+body{
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-/* Basis */
-.clock {
-  font-family: 'Rubik', sans-serif;
-  font-size: 25vw;
-  letter-spacing: 0.06em;
-  line-height: 1;
-  user-select: none;
-  pointer-events: none;
+/* Wrapper verhindert Abschneiden */
+#wrap{
+  max-width:100vw;
+  max-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
 }
 
-/* Untere dunkle Ebene */
-.layer-dark {
-  position: absolute;
-  inset: 0;
-  color: #0057b8;
+/* Uhr */
+.clock{
+  position:absolute;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: min(26vw, 26vh);
+  font-weight:900;
+  letter-spacing:0.05em;
+  line-height:1;
+  pointer-events:none;
 }
 
-/* Mittlere kräftige Ebene */
-.layer-main {
-  position: absolute;
-  inset: 0;
-  color: #0077d9;
-  opacity: 0.95;
+/* Farbebenen exakt wie Bild */
+.dark{ color:#005fb3; }
+.mid{ color:#007edc; opacity:0.95; }
+.light{ color:#5bb4ff; opacity:0.75; }
+
+.dots{
+  color:#e3eef7;
+  margin:0 0.15em;
 }
 
-/* Helle obere Ebene */
-.layer-light {
-  position: absolute;
-  inset: 0;
-  color: #4fa9ff;
-  opacity: 0.75;
-}
-
-/* Punkte */
-.dots {
-  color: #dce7f0;
-  filter: drop-shadow(0 0 10px rgba(255,255,255,0.4));
-}
-
-/* Weicher Glow */
-#clock-wrapper {
-  filter: drop-shadow(0 0 40px rgba(0,176,255,0.35));
+/* Glow */
+#wrap{
+  filter: drop-shadow(0 0 40px rgba(0,170,255,0.35));
 }
 </style>
 </head>
-<body>
 
-<div id="clock-wrapper">
-  <div class="clock layer-dark">00<span class="dots">:</span>00</div>
-  <div class="clock layer-main">00<span class="dots">:</span>00</div>
-  <div class="clock layer-light">00<span class="dots">:</span>00</div>
+<body>
+<div id="wrap">
+  <div class="clock dark">00<span class="dots">:</span>00</div>
+  <div class="clock mid">00<span class="dots">:</span>00</div>
+  <div class="clock light">00<span class="dots">:</span>00</div>
 </div>
 
 <script>
-function updateTime() {
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2, "0");
-  const m = String(now.getMinutes()).padStart(2, "0");
-
-  document.querySelectorAll(".clock").forEach(el => {
-    el.innerHTML = `${h}<span class="dots">:</span>${m}`;
+function update(){
+  const d=new Date();
+  const h=String(d.getHours()).padStart(2,"0");
+  const m=String(d.getMinutes()).padStart(2,"0");
+  document.querySelectorAll(".clock").forEach(c=>{
+    c.innerHTML=`${h}<span class="dots">:</span>${m}`;
   });
 }
+update();
+setInterval(update,1000);
 
-/* Vollbild per Tipp – ohne Bildgefühl */
-document.addEventListener("click", () => {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen().catch(() => {});
+/* Vollbild */
+document.addEventListener("click",()=>{
+  if(!document.fullscreenElement){
+    document.documentElement.requestFullscreen().catch(()=>{});
   }
 });
 
-/* Extra Schutz */
-document.addEventListener("contextmenu", e => e.preventDefault());
-document.addEventListener("dragstart", e => e.preventDefault());
+/* Querformat erzwingen */
+if(screen.orientation && screen.orientation.lock){
+  screen.orientation.lock("landscape").catch(()=>{});
+}
 
-updateTime();
-setInterval(updateTime, 1000);
+/* Kein Bild-Verhalten */
+document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("dragstart",e=>e.preventDefault());
+
+/* Service Worker inline (PWA) */
+if("serviceWorker" in navigator){
+  const swCode = `
+    self.addEventListener('install', e => self.skipWaiting());
+    self.addEventListener('fetch', e => {});
+  `;
+  const blob = new Blob([swCode], {type:"text/javascript"});
+  const url = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(url);
+}
 </script>
-
 </body>
 </html>
