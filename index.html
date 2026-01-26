@@ -32,7 +32,6 @@ body{
   align-items:center;
 }
 
-/* Vollbild */
 #clock{
   width:100vw;
   height:100vh;
@@ -41,21 +40,20 @@ body{
   align-items:center;
 }
 
-/* Uhr */
 .time{
   font-family:'Rubik', sans-serif;
-  font-size:40vw;           /* RIESIGE BASIS */
+  font-size:34vw;        /* kleiner als vorher */
   line-height:1;
   white-space:nowrap;
-  transform:scale(1.25);   /* <<< DAS ist der Key */
+  transform:scale(1.05); /* <<< KORRIGIERT */
   transform-origin:center;
   pointer-events:none;
 }
 
-/* Farb-Layer exakt wie Bild */
-.layer1{ color:#004a99; }
-.layer2{ color:#0070d8; }
-.layer3{ color:#5bb3ff; opacity:0.9; }
+/* Farben exakt wie Bild */
+.layer1{ color:#003f87; }
+.layer2{ color:#0066cc; }
+.layer3{ color:#66b7ff; opacity:0.9; }
 
 .dots{
   color:#eaf4ff;
