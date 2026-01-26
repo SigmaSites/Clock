@@ -68,6 +68,9 @@ document.body.addEventListener("click", () => {
     document.documentElement.requestFullscreen().catch(() => {});
   }
 });
+  document.addEventListener("contextmenu",e=>e.preventDefault());
+document.addEventListener("dragstart",e=>e.preventDefault());
+
 
 updateTime();
 setInterval(updateTime, 1000);
