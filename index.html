@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Uhr</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@900&display=swap" rel="stylesheet">
 
@@ -26,48 +26,41 @@ html, body{
   -webkit-tap-highlight-color:transparent;
 }
 
-#clock{
-  position:fixed;
-  inset:0;
+body{
   display:flex;
   justify-content:center;
   align-items:center;
 }
 
-/* Basisgröße – wird gleich skaliert */
-.time-wrap{
-  position:relative;
+#clock{
+  width:100vw;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.time{
   font-family:'Rubik', sans-serif;
-  font-size:500px; /* feste Basis */
+  font-size:34vw;
   line-height:1;
   white-space:nowrap;
+  transform:scale(1.02);
   transform-origin:center;
-}
-
-/* Ebenen */
-.layer{
-  position:absolute;
-  inset:0;
   pointer-events:none;
+  display:flex;
+  align-items:center;
 }
 
-/* Farben + Überlappung */
-.layer.back{
-  color:#003f87;
-  transform:translate(-0.06em, 0.06em);
-}
-
-.layer.mid{
-  color:#0066cc;
-  transform:translate(0.03em, -0.03em);
-}
-
-.layer.front{
-  color:#66b7ff;
-}
+/* Farben pro Ziffer (wie im Bild) */
+.d1{ color:#003f87; }
+.d2{ color:#005fbf; }
+.d3{ color:#0080ff; }
+.d4{ color:#66b7ff; }
 
 .colon{
   color:#eaf4ff;
+  padding:0 0.05em;
 }
 </style>
 </head>
@@ -75,37 +68,26 @@ html, body{
 <body>
 
 <div id="clock">
-  <div class="time-wrap" id="timeWrap">
-    <div class="layer back" id="t1">00<span class="colon">:</span>00</div>
-    <div class="layer mid"  id="t2">00<span class="colon">:</span>00</div>
-    <div class="layer front" id="t3">00<span class="colon">:</span>00</div>
+  <div class="time">
+    <span class="d1" id="h1">0</span>
+    <span class="d2" id="h2">0</span>
+    <span class="colon">:</span>
+    <span class="d3" id="m1">0</span>
+    <span class="d4" id="m2">0</span>
   </div>
 </div>
 
 <script>
-const wrap = document.getElementById('timeWrap');
-
 function updateTime(){
   const now = new Date();
   const h = String(now.getHours()).padStart(2,'0');
   const m = String(now.getMinutes()).padStart(2,'0');
-  const time = `${h}<span class="colon">:</span>${m}`;
 
-  t1.innerHTML = time;
-  t2.innerHTML = time;
-  t3.innerHTML = time;
-
-  scaleClock();
+  document.getElementById('h1').textContent = h[0];
+  document.getElementById('h2').textContent = h[1];
+  document.getElementById('m1').textContent = m[0];
+  document.getElementById('m2').textContent = m[1];
 }
-
-function scaleClock(){
-  const vw = window.innerWidth;
-  const rect = wrap.getBoundingClientRect();
-  const scale = (vw * 0.98) / rect.width; // 98% Breite
-  wrap.style.transform = `scale(${scale})`;
-}
-
-window.addEventListener('resize', scaleClock);
 
 document.addEventListener('click',()=>{
   if(!document.fullscreenElement){
