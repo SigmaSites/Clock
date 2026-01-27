@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Uhr</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@900&display=swap" rel="stylesheet">
 
@@ -26,47 +26,40 @@ html, body{
   -webkit-tap-highlight-color:transparent;
 }
 
-body{
-  display:flex;
-  justify-content:center;
-  align-items:center;
-}
-
+/* Uhr immer exakt im Zentrum */
 #clock{
-  width:100vw;
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%, -50%);
+  overflow:visible; /* WICHTIG */
 }
 
-/* WICHTIG: Platz für Überlappung */
+/* Wrapper */
 .time-wrap{
   position:relative;
   font-family:'Rubik', sans-serif;
-  font-size:32vw;        /* groß, aber sicher */
+  font-size:28vmin;   /* <<< KEY: richtet sich nach kleinem Maß */
   line-height:1;
   white-space:nowrap;
-  padding:0.15em;        /* verhindert Abschneiden */
 }
 
 /* Ebenen */
 .layer{
   position:absolute;
-  top:0;
-  left:0;
+  inset:0;
   pointer-events:none;
 }
 
-/* Farben + Versatz wie Bild */
+/* Farben + Überlappung wie Bild */
 .layer.back{
   color:#003f87;
-  transform:translate(-0.04em, 0.04em);
+  transform:translate(-0.05em, 0.05em);
 }
 
 .layer.mid{
   color:#0066cc;
-  transform:translate(0.02em, -0.02em);
+  transform:translate(0.025em, -0.025em);
 }
 
 .layer.front{
@@ -96,9 +89,9 @@ function updateTime(){
   const m = String(now.getMinutes()).padStart(2,'0');
   const time = `${h}<span class="colon">:</span>${m}`;
 
-  document.getElementById('t1').innerHTML = time;
-  document.getElementById('t2').innerHTML = time;
-  document.getElementById('t3').innerHTML = time;
+  t1.innerHTML = time;
+  t2.innerHTML = time;
+  t3.innerHTML = time;
 }
 
 document.addEventListener('click',()=>{
