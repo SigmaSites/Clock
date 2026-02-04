@@ -2,8 +2,10 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Uhr mit Kachel</title>
+<title>Uhr</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@900&display=swap" rel="stylesheet">
 
 <style>
 *{
@@ -17,19 +19,53 @@ html, body{
   height:100%;
   background:black;
   overflow:hidden;
+
+  user-select:none;
+  -webkit-user-select:none;
+  -webkit-touch-callout:none;
+  -webkit-tap-highlight-color:transparent;
 }
 
-/* ===== UHR (Platzhalter) ===== */
+/* ===== UHR ===== */
 #clock{
   position:fixed;
   inset:0;
   display:flex;
   justify-content:center;
   align-items:center;
+}
+
+.time-wrap{
+  position:relative;
+  font-family:'Rubik', sans-serif;
+  font-size:500px;   /* Basisgröße */
+  line-height:1;
+  white-space:nowrap;
+  transform-origin:center;
+}
+
+.layer{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+.layer.back{
+  color:#003f87;
+  transform:translate(-0.06em, 0.06em);
+}
+
+.layer.mid{
+  color:#0066cc;
+  transform:translate(0.03em, -0.03em);
+}
+
+.layer.front{
   color:#66b7ff;
-  font-size:20vw;
-  font-family:Arial, sans-serif;
-  user-select:none;
+}
+
+.colon{
+  color:#eaf4ff;
 }
 
 /* ===== KACHELN ===== */
@@ -44,14 +80,13 @@ html, body{
 
 .tile{
   width:110px;
-  aspect-ratio:1 / 1;          /* <<< exakt 1:1 */
+  aspect-ratio:1 / 1;
   background:#111;
   border-radius:16px;
   display:flex;
   justify-content:center;
   align-items:center;
   cursor:pointer;
-  user-select:none;
 }
 
 .tile svg{
@@ -65,12 +100,17 @@ html, body{
 <body>
 
 <!-- Uhr -->
-<div id="clock">12:34</div>
+<div id="clock">
+  <div class="time-wrap" id="timeWrap">
+    <div class="layer back" id="t1">00<span class="colon">:</span>00</div>
+    <div class="layer mid"  id="t2">00<span class="colon">:</span>00</div>
+    <div class="layer front" id="t3">00<span class="colon">:</span>00</div>
+  </div>
+</div>
 
-<!-- Kacheln -->
+<!-- GitHub-Kachel -->
 <div id="tiles">
-  <div class="tile" data-url="https://github.com/maxister13">
-    <!-- GitHub Logo (SVG, kein Bild, perfekt klickbar) -->
+  <div class="tile" data-url="https://maxister13.github.io/My-Sites/">
     <svg viewBox="0 0 16 16" aria-hidden="true">
       <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 
       7.59.4.07.55-.17.55-.38 
@@ -101,29 +141,54 @@ html, body{
 </div>
 
 <script>
+const wrap = document.getElementById('timeWrap');
 const tiles = document.getElementById('tiles');
 
-/* Klick auf Kachel */
+function updateTime(){
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2,'0');
+  const m = String(now.getMinutes()).padStart(2,'0');
+  const time = `${h}<span class="colon">:</span>${m}`;
+
+  t1.innerHTML = time;
+  t2.innerHTML = time;
+  t3.innerHTML = time;
+
+  scaleClock();
+}
+
+function scaleClock(){
+  const vw = window.innerWidth;
+  const rect = wrap.getBoundingClientRect();
+  const scale = (vw * 0.98) / rect.width;
+  wrap.style.transform = `scale(${scale})`;
+}
+
+window.addEventListener('resize', scaleClock);
+
+/* Kachel-Klick */
 document.querySelectorAll('.tile').forEach(tile=>{
   tile.addEventListener('click',()=>{
     window.open(tile.dataset.url, '_blank');
   });
 });
 
-/* Ein-/Ausblenden je nach Vollbild */
+/* Vollbild → Kachel aus */
 function updateTiles(){
   tiles.style.display = document.fullscreenElement ? 'none' : 'flex';
 }
-
 document.addEventListener('fullscreenchange', updateTiles);
 updateTiles();
 
-/* Klick irgendwo → Vollbild */
+/* Klick → Vollbild */
 document.addEventListener('click',()=>{
   if(!document.fullscreenElement){
     document.documentElement.requestFullscreen().catch(()=>{});
   }
 });
+
+updateTime();
+setInterval(updateTime,1000);
 </script>
 
 </body>
