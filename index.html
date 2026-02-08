@@ -43,16 +43,15 @@ body{
 
 .time{
   font-family:'Rubik', sans-serif;
-  font-size:28vw;          /* 🔽 kleiner als vorher */
+  font-size:28vw;
   line-height:1;
   white-space:nowrap;
-  transform:scale(1);
   pointer-events:none;
   display:flex;
   align-items:center;
 }
 
-/* Farben wie im Bild */
+/* Farben */
 .d1{ color:#003366; }
 .d2{ color:#0052a3; }
 .d3{ color:#1e88ff; }
@@ -66,13 +65,12 @@ body{
 /* ===== GITHUB KACHEL ===== */
 #githubTile{
   position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  width:100px;
+  bottom:14px;
+  left:14px;            /* 👈 links */
+  width:56px;           /* 👈 kleiner */
   aspect-ratio:1 / 1;
   background:#111;
-  border-radius:16px;
+  border-radius:12px;
   display:flex;
   justify-content:center;
   align-items:center;
@@ -89,7 +87,6 @@ body{
 
 <body>
 
-<!-- Uhr -->
 <div id="clock">
   <div class="time">
     <span class="d1" id="h1">0</span>
@@ -100,7 +97,6 @@ body{
   </div>
 </div>
 
-<!-- GitHub Verknüpfung -->
 <div id="githubTile" data-url="https://maxister13.github.io/My-Sites/">
   <svg viewBox="0 0 16 16" aria-hidden="true">
     <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 
@@ -133,7 +129,6 @@ body{
 <script>
 const githubTile = document.getElementById('githubTile');
 
-/* Uhr aktualisieren */
 function updateTime(){
   const now = new Date();
   const h = String(now.getHours()).padStart(2,'0');
@@ -145,7 +140,6 @@ function updateTime(){
   m2.textContent = m[1];
 }
 
-/* Vollbild → GitHub ausblenden */
 function updateTileVisibility(){
   githubTile.style.display = document.fullscreenElement ? 'none' : 'flex';
 }
@@ -153,13 +147,11 @@ function updateTileVisibility(){
 document.addEventListener('fullscreenchange', updateTileVisibility);
 updateTileVisibility();
 
-/* Klick auf GitHub */
 githubTile.addEventListener('click', (e)=>{
   e.stopPropagation();
   window.open(githubTile.dataset.url, '_blank');
 });
 
-/* Klick irgendwo → Vollbild */
 document.addEventListener('click',()=>{
   if(!document.fullscreenElement){
     document.documentElement.requestFullscreen().catch(()=>{});
